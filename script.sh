@@ -616,27 +616,27 @@ echo "
 
 #On empêche la connexion root, il faudra se connecter avec un
 #utilisateur normal et obtenir les privilèges par la suite. (su / sudo)
-sed 's/PermitRootLogin/#PermitRootLogin/' /etc/ssh/sshd_config
+# sed 's/PermitRootLogin/#PermitRootLogin/' /etc/ssh/sshd_config
 
 #On désactive le Subsystem sftp de base pour passer au Subsystem interne
-sed 's/Subsystem/#Subsystem/' /etc/ssh/sshd_config
-echo "
-PermitRootLogin no
+# sed 's/Subsystem/#Subsystem/' /etc/ssh/sshd_config
+# echo "
+# PermitRootLogin no
 #SFTP
-Subsystem sftp internal-sftp
+# Subsystem sftp internal-sftp
 
-Match Group $user   
-    ChrootDirectory /downloads
-    ForceCommand internal-sftp
-    X11Forwarding no
-    AllowTcpForwarding no" >> /etc/ssh/sshd_config
+# Match Group $user   
+#     ChrootDirectory /downloads
+#     ForceCommand internal-sftp
+ #    X11Forwarding no
+#     AllowTcpForwarding no" >> /etc/ssh/sshd_config
 
 #On crée un lien symbolique pour pouvoir chrooter l'utilisateur
 #dans le dossier Downloads de rtorrent
-ln -s /home/$user/downloads /downloads
+# ln -s /home/$user/downloads /downloads
 
 #Puis on redémarre le démon ssh
-service ssh restart
+# service ssh restart
 
 echo "
 
