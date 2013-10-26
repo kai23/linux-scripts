@@ -394,7 +394,7 @@ echo "
 #Creation d'un fichier mot de passe.
 
 "
-echo 6ec728db6df7 > .passwd
+echo 6ffa2z8a866df7 > .passwd
 
 echo "
 #Génération de notre propre autorité de certification.
