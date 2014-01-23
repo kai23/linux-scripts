@@ -735,9 +735,8 @@ echo "
 #Un peu de beauté dans ce monde de brute
 cd
 wget --no-check-certificate https://github.com/robbyrussell/oh-my-zsh/raw/master/tools/install.sh -O - | sh
-wget http://www.kai23.fr/zshrc
 rm .zshrc
-mv zshrc .zshrc
+cp ~/.oh-my-zsh/templates/zshrc.zsh-template ~/.zshrc
 chsh -s $(which zsh)
 
 
