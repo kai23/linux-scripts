@@ -1,33 +1,187 @@
-aptitude update
-aptitude safe-upgrade --assume-yes
-aptitude install --assume-yes htop build-essential pkg-config libcurl4-openssl-dev libsigc++-2.0-dev libncurses5-dev nginx vim nano screen subversion apache2-utils curl php5 php5-cli php5-fpm php5-curl php5-geoip git unzip unrar rar zip buildtorrent mediainfo
+# /bin/bash
 
-cd /tmp
-svn checkout http://svn.code.sf.net/p/xmlrpc-c/code/stable xmlrpc-c
-cd xmlrpc-c/
-./configure
-make
-make install
+#On commence par vérifier que le script est lancé en tant que root
+if [ `whoami` != "root" ]; then
+    echo "Vous devez avoir les privilèges super-utilisateur pour exécuter ce script."
+    exit 1
+fi
+
+#On installe dialog pour afficher les messages
+clear
+echo "Patientez un instant SVP."
+apt-get install dialog > /dev/null
+
+dialog --title "Debian SeedBox Installer v1.0" --clear --yesno "Ce script est fait pour être exécuté sur une installation Debian/Ubuntu vierge.
+L'installation prendra environ 20 minutes et se déroulera en plusieurs étapes successives :
+- Installation et configuration de rTorrent
+- Installation et configuration de ruTorrent et ses plugins
+- Installation et configuration de nginx
+- Ajout d'un utilisateur pour ruTorrent
+Ce script est fourni tel quel, vous l'utilisez en toute connaissance de cause, à vos risques et périls.
+Souhaitez-vous continuer?" 0 0
+
+#On teste le code de retour de dialog pour savoir si l'utilisateur a répondu oui ou non
+if [ $? -eq 1 ]
+then
+    clear
+    exit 1
+fi
+
+cmd=(dialog --separate-output --checklist "Choisir ce que vous souhaitez installer en plus" 22 76 16)
+options=(1 "MySQL et phpMyAdmin" off    # any option can be set to default to "on"
+         2 "Seafile" off
+         3 "OhMyZsh" off)
+choices=$("${cmd[@]}" "${options[@]}" 2>&1 >/dev/tty)
+clear
+mysql=false;
+seafile=false;
+omzsh=false;
+for choice in $choices
+do
+    case $choice in
+        1)
+           mysql=true
+           ;;
+        2)
+           seafile=true
+           ;;
+        3)
+           omzsh=true
+           ;;
+    esac
+done
+
+echo "0" | dialog --no-cancel --gauge "Mise à jour du système" 0 0
+apt-get update -y > /dev/null
+echo "10" | dialog --no-cancel --gauge "Mise à jour du système" 0 0
+apt-get upgrade -y > /dev/null
+clear
+echo "33" | dialog --no-cancel --gauge "Installation des paquets nécessaires" 0 0
+sudo apt-get install -y htop > /dev/null
+clear
+echo "35" | dialog --no-cancel --gauge "Installation des paquets nécessaires" 0 0
+sudo apt-get install -y build-essential > /dev/null
+clear
+echo "38" | dialog --no-cancel --gauge "Installation des paquets nécessaires" 0 0
+sudo apt-get install -y pkg-config > /dev/null
+clear
+echo "40" | dialog --no-cancel --gauge "Installation des paquets nécessaires" 0 0
+sudo apt-get install -y libcurl4-openssl-dev > /dev/null
+clear
+echo "43" | dialog --no-cancel --gauge "Installation des paquets nécessaires" 0 0
+sudo apt-get install -y libsigc++-2.0-dev > /dev/null
+clear
+echo "48" | dialog --no-cancel --gauge "Installation des paquets nécessaires" 0 0
+sudo apt-get install -y libncurses5-dev > /dev/null
+clear
+echo "50" | dialog --no-cancel --gauge "Installation des paquets nécessaires" 0 0
+sudo apt-get install -y nginx > /dev/null
+clear
+echo "55" | dialog --no-cancel --gauge "Installation des paquets nécessaires" 0 0
+sudo apt-get install -y vim > /dev/null
+clear
+echo "56" | dialog --no-cancel --gauge "Installation des paquets nécessaires" 0 0
+sudo apt-get install -y nano > /dev/null
+clear
+echo "58" | dialog --no-cancel --gauge "Installation des paquets nécessaires" 0 0
+sudo apt-get install -y screen > /dev/null
+clear
+echo "59" | dialog --no-cancel --gauge "Installation des paquets nécessaires" 0 0
+sudo apt-get install -y subversion > /dev/null
+clear
+echo "60" | dialog --no-cancel --gauge "Installation des paquets nécessaires" 0 0
+sudo apt-get install -y apache2-utils > /dev/null
+clear
+echo "65" | dialog --no-cancel --gauge "Installation des paquets nécessaires" 0 0
+sudo apt-get install -y curl > /dev/null
+clear
+echo "66" | dialog --no-cancel --gauge "Installation des paquets nécessaires" 0 0
+sudo apt-get install -y php5 > /dev/null
+clear
+echo "69" | dialog --no-cancel --gauge "Installation des paquets nécessaires" 0 0
+sudo apt-get install -y php5-cli > /dev/null
+clear
+echo "70" | dialog --no-cancel --gauge "Installation des paquets nécessaires" 0 0
+sudo apt-get install -y php5-fpm > /dev/null
+clear
+echo "71" | dialog --no-cancel --gauge "Installation des paquets nécessaires" 0 0
+sudo apt-get install -y php5-curl > /dev/null
+clear
+echo "71" | dialog --no-cancel --gauge "Installation des paquets nécessaires" 0 0
+sudo apt-get install -y php5-geoip > /dev/null
+clear
+echo "73" | dialog --no-cancel --gauge "Installation des paquets nécessaires" 0 0
+sudo apt-get install -y git > /dev/null
+clear
+echo "74" | dialog --no-cancel --gauge "Installation des paquets nécessaires" 0 0
+sudo apt-get install -y unzip > /dev/null
+clear
+echo "78" | dialog --no-cancel --gauge "Installation des paquets nécessaires" 0 0
+sudo apt-get install -y unrar > /dev/null
+clear
+echo "79" | dialog --no-cancel --gauge "Installation des paquets nécessaires" 0 0
+sudo apt-get install -y rar > /dev/null
+clear
+echo "80" | dialog --no-cancel --gauge "Installation des paquets nécessaires" 0 0
+sudo apt-get install -y zip > /dev/null
+clear
+echo "83" | dialog --no-cancel --gauge "Installation des paquets nécessaires" 0 0
+sudo apt-get install -y buildtorrent > /dev/null
+clear
+echo "85" | dialog --no-cancel --gauge "Installation des paquets nécessaires" 0 0
+sudo apt-get install -y mediainfo > /dev/null
+clear
+echo "90" | dialog --no-cancel --gauge "Installation des paquets nécessaires" 0 0
+sudo add-apt-repository ppa:jon-severinsson/ffmpeg --yes  > /dev/null
+sudo apt-get update > /dev/null
+sudo apt-get install -y ffmpeg  > /dev/null
+clear
+echo "100" | dialog --no-cancel --gauge "Installation des paquets nécessaires" 0 0
+
+echo "0" | dialog --no-cancel --gauge "Installation et configuration de rTorrent" 0 0
+cd /tmp 
+svn checkout http://svn.code.sf.net/p/xmlrpc-c/code/stable xmlrpc-c > /dev/null
+cd xmlrpc-c/ 
+./configure > /dev/null
+clear
+echo "30" | dialog --no-cancel --gauge "Installation et configuration de rTorrent" 0 0
+make > /dev/null
+clear
+echo "15" | dialog --no-cancel --gauge "Installation et configuration de rTorrent" 0 0
+make install > /dev/null
+clear
+echo "20" | dialog --no-cancel --gauge "Installation et configuration de rTorrent" 0 0
 
 cd /tmp
 wget http://libtorrent.rakshasa.no/downloads/libtorrent-0.13.4.tar.gz
+echo "30" | dialog --no-cancel --gauge "Installation et configuration de rTorrent" 0 0
 tar --verbose --gzip --extract --file libtorrent-0.13.4.tar.gz
 cd libtorrent-0.13.4
 ./configure
+echo "40" | dialog --no-cancel --gauge "Installation et configuration de rTorrent" 0 0
 make
+echo "45" | dialog --no-cancel --gauge "Installation et configuration de rTorrent" 0 0
 make install
+echo "50" | dialog --no-cancel --gauge "Installation et configuration de rTorrent" 0 0
 
 cd /tmp
 wget http://libtorrent.rakshasa.no/downloads/rtorrent-0.9.4.tar.gz
+echo "60" | dialog --no-cancel --gauge "Installation et configuration de rTorrent" 0 0
 tar --verbose --gzip --extract --file rtorrent-0.9.4.tar.gz
+echo "70" | dialog --no-cancel --gauge "Installation et configuration de rTorrent" 0 0
 cd rtorrent-0.9.4
 ./configure --with-xmlrpc-c
+echo "72" | dialog --no-cancel --gauge "Installation et configuration de rTorrent" 0 0
 make
+echo "75" | dialog --no-cancel --gauge "Installation et configuration de rTorrent" 0 0
 make install
+echo "85" | dialog --no-cancel --gauge "Installation et configuration de rTorrent" 0 0
 
 ldconfig
 
-mkdir /var/www && cd /var/www
+echo "90" | dialog --no-cancel --gauge "Installation et configuration de rTorrent" 0 0
+mkdir /var/www
+cd /var/www
 git clone https://github.com/Novik/ruTorrent.git rutorrent
 
 cd /var/www/rutorrent/plugins/
@@ -50,6 +204,7 @@ svn checkout http://rutorrent-pausewebui.googlecode.com/svn/trunk/ pausewebui
 cd /var/www/rutorrent/plugins/
 svn checkout http://svn.rutorrent.org/svn/filemanager/trunk/filemanager
 
+echo "95" | dialog --no-cancel --gauge "Installation et configuration de rTorrent" 0 0
 chown --recursive www-data:www-data /var/www/rutorrent
 
 echo "<?php
@@ -60,8 +215,8 @@ echo "<?php
 
 
 echo "<?php
-\$fm['tempdir'] = '/tmp';	
-\$fm['mkdperm'] = 755; 	
+\$fm['tempdir'] = '/tmp';   
+\$fm['mkdperm'] = 755;  
 \$pathToExternals['rar'] = '/usr/bin/rar';
 \$pathToExternals['zip'] = '/usr/bin/zip';
 \$pathToExternals['unzip'] = '/usr/bin/unzip';
@@ -80,7 +235,10 @@ sed -i 's/expose_php = On/expose_php = Off/g' /etc/php5/fpm/php.ini
 sed -i 's/post_max_size = 8M/post_max_size = 800M/g' /etc/php5/fpm/php.ini
 sed -i 's/upload_max_filesize = 2M/upload_max_filesize = 2000M/g' /etc/php5/fpm/php.ini
 sed -i 's/;date.timezone =/date.timezone = Europe\/Paris/g' /etc/php5/fpm/php.ini
+echo "100" | dialog --no-cancel --gauge "Installation et configuration de rTorrent" 0 0
 
+
+echo "0" | dialog --no-cancel --gauge "Configuration de Nginx" 0 0
 service php5-fpm restart
 
 mkdir /etc/nginx/passwd
@@ -152,6 +310,8 @@ echo "location ~* \.(jpg|jpeg|gif|css|png|js|woff|ttf|svg|eot)\$ {
 location ~* \.(eot|ttf|woff|svg)\$ {
     add_header Acccess-Control-Allow-Origin *;
 }" > /etc/nginx/conf.d/cache
+
+echo "10" | dialog --no-cancel --gauge "Configuration de Nginx" 0 0
 
 mkdir /etc/nginx/sites-enabled
 
@@ -239,12 +399,9 @@ if [ `whoami` != "root" ]; then
     exit 1
 fi
 
+echo "100" | dialog --no-cancel --gauge "Configuration de Nginx" 0 0
 
 clear
-echo "Patientez un instant SVP."
-apt-get install dialog > /dev/null
-apt-get install usermod > /dev/null
-
 dialog --title "Debian SeedBox Installer v1.0" --clear --yesno "Ce script permet d'ajouter un utilisateur. Souhaitez-vous continuer?" 0 0
 #On teste le code de retour de dialog pour savoir si l'utilisateur a répondu oui ou non
 if [ $? -eq 1 ]
